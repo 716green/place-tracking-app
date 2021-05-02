@@ -1,35 +1,32 @@
-import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import React, { useRef, useEffect } from 'react';
 
-const styles = {
-  width: '100%',
-  height: '100%',
-};
+import './Map.css';
 
 export const Map = (props) => {
-  const [map, setMap] = useState(null);
-  const mapContainer = useRef(null);
+  const mapRef = useRef();
+
   const { center, zoom } = props;
 
   useEffect(() => {
-    mapboxgl.accessToken = 'YOUR_MAPBOX_API_KEY';
-    const initializeMap = ({ setMap, mapContainer }) => {
-      const map = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/streets-v11',
-        center: center,
+    new window.ol.Map({
+      target: mapRef.current.id,
+      layers: [
+        new window.ol.layer.Tile({
+          source: new window.ol.source.OSM(),
+        }),
+      ],
+      view: new window.ol.View({
+        center: window.ol.proj.fromLonLat([center.lng, center.lat]),
         zoom: zoom,
-      });
+      }),
+    });
+  }, [center, zoom]);
 
-      map.on('load', () => {
-        setMap(map);
-        map.resize();
-      });
-    };
-
-    if (!map) initializeMap({ setMap, mapContainer });
-  }, [map, center, zoom]);
-
-  return <div ref={(el) => (mapContainer.current = el)} style={styles} />;
+  return (
+    <div
+      ref={mapRef}
+      className={`map ${props.className}`}
+      style={props.style}
+      id="map"></div>
+  );
 };
