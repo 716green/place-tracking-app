@@ -55,12 +55,10 @@ const PlaceItem = (props) => {
             </Button>
           </React.Fragment>
         }>
-        {/* <Modal> */}
         <p>
           Do you want to proceed and delete this place? Please note that this
           can't be undone.
         </p>
-        {/* </Modal> */}
       </Modal>
 
       <li className="place-item">
