@@ -1,3 +1,7 @@
+a {
+  text-decoration: none;
+}
+
 .main-navigation__menu-btn {
   width: 3rem;
   height: 3rem;
@@ -18,6 +22,7 @@
 }
 
 .main-navigation__title {
+  text-decoration: none;
   color: white;
 }
 
@@ -25,6 +30,10 @@
   text-decoration: none;
   color: white;
 }
+
+/* Link {
+  text-decoration: none;
+} */
 
 .main-navigation__header-nav {
   display: none;
