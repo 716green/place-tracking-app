@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useForm } from '../../shared/hooks/form-hook';
 import {
   VALIDATOR_MINLENGTH,
@@ -7,8 +7,10 @@ import {
 import { Input } from '../../shared/components/FormElements/Input';
 import Button from '../../shared/components/FormElements/Button';
 import './Authenticate.css';
+import { AuthContext } from '../../shared/context/auth-context';
 
 function Authenticate() {
+  const auth = useContext(AuthContext);
   const [formState, inputHandler, setFormData] = useForm(
     {
       email: {
@@ -51,6 +53,7 @@ function Authenticate() {
   const authSubmitHandler = (event) => {
     event.preventDefault();
     console.log(formState.inputs); // todo - send to the server
+    auth.login();
   };
 
   return (
