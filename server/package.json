@@ -9,6 +9,8 @@
   "author": "Bob Bass",
   "license": "ISC",
   "dependencies": {
+    "arcgis-js-api": "^4.19.3",
+    "axios": "^0.21.1",
     "express": "^4.17.1",
     "express-validator": "^6.11.1",
     "uuid": "^8.3.2"

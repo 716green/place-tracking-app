@@ -1,6 +1,39 @@
 const HttpError = require('../models/http-error');
 const { v4: uuid } = require('uuid');
 const { validationResult } = require('express-validator');
+const getGeocode = require('../util/location');
+const xyLocation = require('../util/location');
+
+// const axios = require('axios');
+
+// const API_KEY =
+//   'AAPKcf12969575f64de7b5009c06553bd7970WIi7BKakY-D6gPDSTXoRRHWP9rlUkkLfUr4P0SN3K30apOX0awFBPZwYnZF21uC';
+
+// let location = {
+//   lat: 0,
+//   lng: 0,
+// };
+
+// const getGeocode = async (address, location) => {
+//   let [lat, lng] = '';
+//   const baseUrl =
+//     'https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer';
+//   const url = `${baseUrl}/findAddressCandidates?address=${address}&f=json&token=${API_KEY}`;
+//   location = await axios.get(url).then(async (response) => {
+//     const { x, y } = await response.data.candidates[0].location;
+//     location.lat = y;
+//     location.lng = x;
+
+//     const cb = () => {
+//       return location;
+//     };
+
+//     return await cb();
+//   });
+//   console.log(location);
+//   console.log(location.lat);
+//   console.log(location.lng);
+// };
 
 let DUMMY_PLACES = [
   {
@@ -46,6 +79,10 @@ const updatePlace = (req, res, next) => {
 
 const deletePlace = (req, res, next) => {
   const placeId = req.params.pid;
+  if (!DUMMY_PLACES.find((p) => p.id === placeId)) {
+    throw new HttpError('Could not find a place for that id.', 404);
+  }
+
   DUMMY_PLACES = DUMMY_PLACES.filter((p) => {
     p.id !== placeId;
   });
@@ -76,24 +113,41 @@ const getPlacesByUserId = (req, res, next) => {
   res.json({ places });
 };
 
-const createPlace = (req, res, next) => {
+const createPlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log(errors);
     throw new HttpError('Invalid inputs passed, please check your data.', 422);
   }
-  const { title, description, coordinates, address, creator } = req.body;
-  const createdPlace = {
-    id: uuid(),
-    title,
-    description,
-    location: coordinates,
-    address,
-    creator,
+
+  const { title, description, address, creator } = req.body;
+
+  const getLatLng = async () => {
+    let latLng = await getGeocode(address);
+    return latLng;
   };
-  DUMMY_PLACES.push(createdPlace);
+
+  let coords;
+  try {
+    getLatLng().then((result) => {
+      coords = result;
+    });
+  } catch (error) {
+    return next(error);
+  }
+  setTimeout(() => {
+    const createdPlace = {
+      id: uuid(),
+      title,
+      description,
+      location: coords,
+      address,
+      creator,
+    };
+    DUMMY_PLACES.push(createdPlace);
+    res.status(201).json({ place: createdPlace });
+  }, 300);
   // 201 - Success adding new item
-  res.status(201).json({ place: createdPlace });
 };
 
 exports.getPlaceById = getPlaceById;
