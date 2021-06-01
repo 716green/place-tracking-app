@@ -2,38 +2,7 @@ const HttpError = require('../models/http-error');
 const { v4: uuid } = require('uuid');
 const { validationResult } = require('express-validator');
 const getGeocode = require('../util/location');
-const xyLocation = require('../util/location');
-
-// const axios = require('axios');
-
-// const API_KEY =
-//   'AAPKcf12969575f64de7b5009c06553bd7970WIi7BKakY-D6gPDSTXoRRHWP9rlUkkLfUr4P0SN3K30apOX0awFBPZwYnZF21uC';
-
-// let location = {
-//   lat: 0,
-//   lng: 0,
-// };
-
-// const getGeocode = async (address, location) => {
-//   let [lat, lng] = '';
-//   const baseUrl =
-//     'https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer';
-//   const url = `${baseUrl}/findAddressCandidates?address=${address}&f=json&token=${API_KEY}`;
-//   location = await axios.get(url).then(async (response) => {
-//     const { x, y } = await response.data.candidates[0].location;
-//     location.lat = y;
-//     location.lng = x;
-
-//     const cb = () => {
-//       return location;
-//     };
-
-//     return await cb();
-//   });
-//   console.log(location);
-//   console.log(location.lat);
-//   console.log(location.lng);
-// };
+const Place = require('../models/place');
 
 let DUMMY_PLACES = [
   {
@@ -127,27 +96,42 @@ const createPlace = async (req, res, next) => {
     return latLng;
   };
 
-  let coords;
+  let coordinates;
   try {
     getLatLng().then((result) => {
-      coords = result;
+      coordinates = result;
     });
-  } catch (error) {
+  } catch (err) {
+    const error = new HttpError(
+      `Coordinate search failed, please try again\n${err}`,
+      500
+    );
     return next(error);
   }
-  setTimeout(() => {
-    const createdPlace = {
-      id: uuid(),
+  //? 3ms timeout required to allow coordinates to generate
+  setTimeout(async () => {
+    const createdPlace = new Place({
       title,
       description,
-      location: coords,
       address,
+      location: coordinates,
+      // todo - This is a placeholder image
+      image:
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Empire_State_Building_in_Rainbow_Colors_for_Gay_Pride_2015_%2819258537982%29.jpg/2560px-Empire_State_Building_in_Rainbow_Colors_for_Gay_Pride_2015_%2819258537982%29.jpg',
       creator,
-    };
-    DUMMY_PLACES.push(createdPlace);
+    });
+    try {
+      await createdPlace.save();
+    } catch (err) {
+      const error = new HttpError(
+        `Creating place filed, please try again\n${err}`,
+        500
+      );
+      return next(error);
+    }
+    //* 201 - Success adding new item
     res.status(201).json({ place: createdPlace });
   }, 300);
-  // 201 - Success adding new item
 };
 
 exports.getPlaceById = getPlaceById;

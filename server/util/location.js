@@ -15,8 +15,8 @@ const getGeocode = async (address) => {
       lng: 0,
     };
 
-    location.lat = y;
-    location.lng = x;
+    location.lat = await y;
+    location.lng = await x;
 
     return location;
   });
