@@ -1,6 +1,5 @@
 const express = require('express');
 const app = express();
-const bodyParser = require('body-parser');
 const port = 5000;
 const HttpError = require('./models/http-error');
 const mongoose = require('mongoose');
@@ -36,7 +35,6 @@ mongoose
   .connect(process.env.MDB_CONN_STR, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    // createIndexes: true,
   })
   .then(() => {
     app.listen(port, () => console.log(`Listening on port ${port}`));

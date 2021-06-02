@@ -1,21 +1,33 @@
 const HttpError = require('../models/http-error');
-
 const { validationResult } = require('express-validator');
 const User = require('../models/user');
 
-// for express-validation package
+//* for express-validation package
 const extractValidationErrorMsg = (err) => {
-  const errorMsg = err.errors.map((a) => a)[0].msg;
+  const errorMsg = err?.errors?.map((a) => a)[0]?.msg || '';
   console.log(errorMsg);
   return errorMsg;
 };
 
-const getUsers = (req, res, next) => {
-  res.status(200).json({ users: DUMMY_USERS });
+const getUsers = async (req, res, next) => {
+  let users;
+  try {
+    //* Return user objects without the password field
+    users = await User.find({}, '-password');
+  } catch (err) {
+    const error = new HttpError(
+      `Fetching users failed, please try again later. ${err}`,
+      500
+    );
+    return next(error);
+  }
+  res
+    .status(200)
+    .json({ users: users.map((user) => user.toObject({ getters: true })) });
 };
 
 const signup = async (req, res, next) => {
-  const { name, email, password, places } = req.body;
+  const { name, email, password } = req.body;
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -52,7 +64,7 @@ const signup = async (req, res, next) => {
     image:
       'https://static.wikia.nocookie.net/memepediadankmemes/images/9/90/192.png/revision/latest?cb=20200610055032',
     password,
-    places,
+    places: [],
   });
 
   try {
