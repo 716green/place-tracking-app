@@ -36,6 +36,7 @@ mongoose
   .connect(process.env.MDB_CONN_STR, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    // createIndexes: true,
   })
   .then(() => {
     app.listen(port, () => console.log(`Listening on port ${port}`));

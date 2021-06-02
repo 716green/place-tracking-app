@@ -8,7 +8,11 @@ const Place = require('../models/place');
 const updatePlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new HttpError('Invalid inputs passed, please check your data.', 422);
+    const err = HttpError(
+      `Invalid inputs passed, please check your data. ${errors}`,
+      422
+    );
+    return next(err);
   }
 
   const { title, description } = req.body;
@@ -113,7 +117,11 @@ const createPlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log(errors);
-    throw new HttpError('Invalid inputs passed, please check your data.', 422);
+    const err = new HttpError(
+      `Invalid inputs passed, please check your data. ${errors}`,
+      422
+    );
+    return next(err);
   }
 
   const { title, description, address, creator } = req.body;
@@ -151,7 +159,7 @@ const createPlace = async (req, res, next) => {
       await createdPlace.save();
     } catch (err) {
       const error = new HttpError(
-        `Creating place filed, please try again\n${err}`,
+        `Creating place failed, please try again\n${err}`,
         500
       );
       return next(error);
