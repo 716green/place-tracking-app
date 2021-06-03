@@ -9,6 +9,8 @@ import Button from '../../shared/components/FormElements/Button';
 import './Authenticate.css';
 import { AuthContext } from '../../shared/context/auth-context';
 
+import { baseURL } from '../../App';
+
 function Authenticate() {
   const auth = useContext(AuthContext);
   const [formState, inputHandler, setFormData] = useForm(
@@ -50,10 +52,33 @@ function Authenticate() {
     setSignupMode(!signupMode);
   };
 
-  const authSubmitHandler = (event) => {
-    event.preventDefault();
-    console.log(formState.inputs); // todo - send to the server
-    auth.login();
+  const authSubmitHandler = async (event) => {
+    if (!signupMode) {
+      console.error({ error: 'NOT SIGNUP MODE' });
+    } else {
+      try {
+        event.preventDefault();
+        const response = await fetch(`${baseURL}/users/signup`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: {
+            name: formState.inputs.name.value,
+            email: formState.inputs.email.value,
+            password: formState.inputs.password.value,
+          },
+        });
+        const responseData = await response.json();
+        console.log({ responseData });
+        let responseIsValid = true;
+        if (responseIsValid) {
+          auth.login(); // only run after validating response
+        } else alert('INVALID AUTH');
+      } catch (err) {
+        console.error(err);
+      }
+    }
   };
 
   return (

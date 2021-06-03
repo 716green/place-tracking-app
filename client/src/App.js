@@ -13,6 +13,8 @@ import UserPlaces from './places/pages/UserPlaces';
 import Authenticate from './places/pages/Authenticate';
 import MainNavigaton from './shared/components/Navigation/MainNavigation';
 
+export const baseURL = 'http://localhost:5000/api';
+
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
