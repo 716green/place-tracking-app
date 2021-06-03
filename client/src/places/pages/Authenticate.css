@@ -17,3 +17,8 @@
 .form-buttons {
   display: flex;
 }
+
+.secondary-btn {
+  cursor: pointer;
+  color: #ff0055;
+}

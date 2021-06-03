@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const usersController = require('../controllers/users-controller');
-const { check } = require('express-validator');
-
-// const HttpError = require('../models/http-error');
+// todo - remove express-validator
+// const { check } = require('express-validator');
 
 //? *************************
 //? ***** USER ROUTES *******
@@ -13,15 +12,7 @@ const { check } = require('express-validator');
 router.get('/', usersController.getUsers);
 
 //* POST - SIGNUP
-router.post(
-  '/signup',
-  [
-    check('name').not().isEmpty(),
-    check('email').normalizeEmail().isEmail(),
-    check('password').isLength({ min: 6 }),
-  ],
-  usersController.signup
-);
+router.post('/signup', usersController.signup);
 
 //* POST
 router.post('/login', usersController.login);

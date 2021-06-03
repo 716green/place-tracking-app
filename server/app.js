@@ -15,6 +15,21 @@ app.use(
   })
 );
 
+// *****************************************
+// * CORS - Express Server to React Client *
+// *****************************************
+// The Authorization header in the second setHeader() is being used because this app is handling authentication with MongoDB
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  );
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE');
+
+  next();
+});
+
 app.use('/api/places', placesRoutes);
 app.use('/api/users', usersRoutes);
 

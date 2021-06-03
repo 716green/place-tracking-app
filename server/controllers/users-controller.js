@@ -1,13 +1,6 @@
 const HttpError = require('../models/http-error');
-const { validationResult } = require('express-validator');
 const User = require('../models/user');
-
-//* for express-validation package
-const extractValidationErrorMsg = (err) => {
-  const errorMsg = err?.errors?.map((a) => a)[0]?.msg || '';
-  console.log(errorMsg);
-  return errorMsg;
-};
+// const { validationResult } = require('express-validator');
 
 const getUsers = async (req, res, next) => {
   let users;
@@ -28,12 +21,15 @@ const getUsers = async (req, res, next) => {
 
 const signup = async (req, res, next) => {
   const { name, email, password } = req.body;
-
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const errorMsg = extractValidationErrorMsg(errors) || '';
+  let errors = email.includes('@') ? '' : 'Error - Email: no @ symbol\n';
+  errors += !!name ? '' : 'Error - Missing Name\n';
+  errors += name.length >= 3 ? '' : 'Error - Missing Name\n';
+  errors += !!password.length ? '' : 'Error - Password too short \n';
+  errors += password.length >= 8 ? '' : 'Error - Password too short \n';
+  if (!!errors) {
+    console.error({ errors });
     const err = new HttpError(
-      `Invalid inputs passed, please check your data. ${errorMsg}.`,
+      `Invalid inputs passed, please check your data. ${errors}.`,
       422
     );
     return next(err);
