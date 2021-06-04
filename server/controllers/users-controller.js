@@ -57,8 +57,7 @@ const signup = async (req, res, next) => {
   const createdUser = new User({
     name,
     email,
-    image:
-      'https://static.wikia.nocookie.net/memepediadankmemes/images/9/90/192.png/revision/latest?cb=20200610055032',
+    image: 'https://api.thispersondoesnotexist.com/image',
     password,
     places: [],
   });

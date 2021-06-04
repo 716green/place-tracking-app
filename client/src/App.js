@@ -10,7 +10,7 @@ import Users from './user/pages/Users';
 import NewPlace from './places/pages/NewPlace';
 import UpdatePlace from './places/pages/UpdatePlace';
 import UserPlaces from './places/pages/UserPlaces';
-import Authenticate from './places/pages/Authenticate';
+import Auth from './places/pages/Auth';
 import MainNavigaton from './shared/components/Navigation/MainNavigation';
 
 export const baseURL = 'http://localhost:5000/api';
@@ -56,7 +56,7 @@ const App = () => {
           <UserPlaces />
         </Route>
         <Route path="/auth">
-          <Authenticate />
+          <Auth />
         </Route>
         <Redirect to="/auth" />
       </Switch>

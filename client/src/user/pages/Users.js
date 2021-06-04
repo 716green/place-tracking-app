@@ -4,48 +4,32 @@ import UsersList from '../components/UsersList';
 import { baseURL } from '../../App';
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
 import { ErrorModal } from '../../shared/components/UIElements/ErrorModal';
+import { useHttpClient } from '../../shared/hooks/http-hook';
 
 const Users = () => {
-  // let allUsers;
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [users, setUsers] = useState([]);
-  // const fetchUserHandler = (data) => {
-  //   setUsers(data);
-  //   // allUsers = users;
-  // };
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  const [loadedUsers, setLoadedUsers] = useState([]);
 
   useEffect(() => {
-    const sendRequest = async () => {
+    const fetchUsers = async () => {
       try {
-        const response = await fetch(`${baseURL}/users`);
+        const responseData = await sendRequest(`${baseURL}/users`);
 
-        const responseData = await response.json();
-
-        if (!response.ok) {
-          throw new Error(responseData.message);
-        }
-        setUsers(responseData.users);
-        setIsLoading(false);
-      } catch (err) {
-        setError(err.message);
-      }
+        setLoadedUsers(responseData.users);
+      } catch (err) {}
     };
-    sendRequest();
-  }, []);
+    fetchUsers();
+  }, [sendRequest]);
 
-  const errorHandler = () => {
-    setError(null);
-  };
   return (
     <React.Fragment>
-      <ErrorModal error={error} onClear={errorHandler} />
+      <ErrorModal error={error} onClear={clearError} />
       {isLoading && (
         <div className="center">
           <LoadingSpinner />
         </div>
       )}
-      {!isLoading && <UsersList items={users} />}
+      {!isLoading && <UsersList items={loadedUsers} />}
     </React.Fragment>
   );
 };
