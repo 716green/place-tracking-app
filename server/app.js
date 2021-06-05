@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const express = require('express');
 const app = express();
 const port = 5000;
@@ -14,6 +16,9 @@ app.use(
     extended: true,
   })
 );
+
+//* Define a static folder (images)
+app.use('/api/uploads/images', express.static(path.join('uploads', 'images')));
 
 // *****************************************
 // * CORS - Express Server to React Client *
@@ -39,6 +44,11 @@ app.use((req, res, next) => {
 });
 
 app.use((error, req, res, next) => {
+  if (req.file) {
+    fs.unlink(req.file.path, (err) => {
+      console.error(err);
+    });
+  }
   if (res.headerSent) {
     return next(error);
   }
@@ -57,3 +67,5 @@ mongoose
   .catch((err) => {
     console.error(err);
   });
+
+// module.exports = { baseURL };

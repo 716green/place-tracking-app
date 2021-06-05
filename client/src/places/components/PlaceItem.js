@@ -1,17 +1,25 @@
 import React, { useState, useContext } from 'react';
+// import { useHistory } from 'react-router-dom';
 
 import Card from '../../shared/components/UIElements/Card';
 import Button from '../../shared/components/FormElements/Button';
 import { Modal } from '../../shared/components/UIElements/Modal';
 import { Map } from '../../shared/components/UIElements/Map';
 
+import { useHttpClient } from '../../shared/hooks/http-hook';
+import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
+import { ErrorModal } from '../../shared/components/UIElements/ErrorModal';
+
 import { AuthContext } from '../../shared/context/auth-context';
+import { baseURL } from '../../App';
 import './PlaceItem.css';
 
 const PlaceItem = (props) => {
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const auth = useContext(AuthContext);
   const [showMap, setShowMap] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  // const history = useHistory();
 
   const openMapHandler = () => setShowMap(true);
   const closeMapHandler = () => setShowMap(false);
@@ -24,13 +32,19 @@ const PlaceItem = (props) => {
     setShowConfirmModal(false);
   };
 
-  const confirmDeleteHandler = () => {
+  const confirmDeleteHandler = async () => {
     setShowConfirmModal(false);
-    console.log('DELETING...');
+    try {
+      await sendRequest(`${baseURL}/places/${props.id}`, 'DELETE');
+      props.onDelete(props.id);
+      // history.push('/' + auth.userId + '/places');
+    } catch (err) {}
   };
 
   return (
     <React.Fragment>
+      <ErrorModal error={error} onClear={clearError} />
+
       <Modal
         show={showMap}
         onCancelHandler={closeMapHandler}
@@ -65,9 +79,10 @@ const PlaceItem = (props) => {
       </Modal>
 
       <li className="place-item">
+        {isLoading && <LoadingSpinner />}
         <Card className="place-item__content">
           <div className="place-item__image">
-            <img src={props.image} alt={props.title} />
+            <img src={`${baseURL}/${props.image}`} alt={props.title} />
           </div>
           <div className="place-item__info">
             <h2>{props.title}</h2>
@@ -79,7 +94,7 @@ const PlaceItem = (props) => {
               VIEW ON MAP
             </Button>
 
-            {auth.isLoggedIn && (
+            {auth.userId === props.creatorId && (
               <React.Fragment>
                 <Button to={`/places/${props.id}`}>EDIT</Button>
                 <Button danger onClick={showDeleteWarningHandler}>

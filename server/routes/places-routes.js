@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const placesControllers = require('../controllers/places-controllers.js');
 const { check } = require('express-validator');
+const fileUpload = require('../middleware/file-upload');
 const {
   getPlacesByUserId,
   getPlaceById,
@@ -24,12 +25,13 @@ router.get('/:pid', getPlaceById);
 //* POST
 router.post(
   '/',
+  fileUpload.single('image'),
   [
     check('title').not().isEmpty(),
     check('description').isLength({ min: 5 }),
     check('address').not().isEmpty(),
   ],
-  createPlace
+  placesControllers.createPlace
 );
 
 //* PATCH - PID

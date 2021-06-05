@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const usersController = require('../controllers/users-controller');
-// todo - remove express-validator
-// const { check } = require('express-validator');
+const fileUpload = require('../middleware/file-upload');
 
 //? *************************
 //? ***** USER ROUTES *******
@@ -12,7 +11,7 @@ const usersController = require('../controllers/users-controller');
 router.get('/', usersController.getUsers);
 
 //* POST - SIGNUP
-router.post('/signup', usersController.signup);
+router.post('/signup', fileUpload.single('image'), usersController.signup);
 
 //* POST
 router.post('/login', usersController.login);

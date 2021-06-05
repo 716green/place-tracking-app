@@ -1,6 +1,5 @@
 const HttpError = require('../models/http-error');
 const User = require('../models/user');
-// const { validationResult } = require('express-validator');
 
 const getUsers = async (req, res, next) => {
   let users;
@@ -19,13 +18,22 @@ const getUsers = async (req, res, next) => {
     .json({ users: users.map((user) => user.toObject({ getters: true })) });
 };
 
-const signup = async (req, res, next) => {
-  const { name, email, password } = req.body;
+const validationResult = (name, email, password) => {
   let errors = email.includes('@') ? '' : 'Error - Email: no @ symbol\n';
   errors += !!name ? '' : 'Error - Missing Name\n';
   errors += name.length >= 3 ? '' : 'Error - Missing Name\n';
   errors += !!password.length ? '' : 'Error - Password too short \n';
-  errors += password.length >= 8 ? '' : 'Error - Password too short \n';
+  errors += password.length >= 6 ? '' : 'Error - Password too short \n';
+  if (!errors || errors.length < 1) {
+    return null;
+  } else {
+    return errors;
+  }
+};
+
+const signup = async (req, res, next) => {
+  const { name, email, password } = req.body;
+  let errors = validationResult(name, email, password);
   if (!!errors) {
     console.error({ errors });
     const err = new HttpError(
@@ -57,7 +65,7 @@ const signup = async (req, res, next) => {
   const createdUser = new User({
     name,
     email,
-    image: 'https://api.thispersondoesnotexist.com/image',
+    image: req.file.path,
     password,
     places: [],
   });
@@ -90,7 +98,10 @@ const login = async (req, res, next) => {
     const error = new HttpError('Invalid credentials. Unable to login.', 401);
     return next(error);
   }
-  res.status(200).json({ message: 'Logged In' });
+  res.status(200).json({
+    message: 'Logged In',
+    user: existingUser.toObject({ getters: true }),
+  });
 };
 
 exports.getUsers = getUsers;

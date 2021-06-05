@@ -120,35 +120,27 @@ const getPlaceById = async (req, res, next) => {
 
 const getPlacesByUserId = async (req, res, next) => {
   const userId = req.params.uid;
-  // let places; // // Without .populate()
-  let userWithPlaces;
+  let places;
   try {
-    //* With .populate()
-    userWithPlaces = await (await User.findById(userId)).populated('places');
-    // places = await Place.find({ creator: userId }); // // Without .populate()
+    places = await Place.find({ creator: userId }); // // Without .populate()
   } catch (err) {
     const error = new HttpError(`Error interacting with database. ${err}`, 500);
     return next(error);
   }
 
-  if (!userWithPlaces || userWithPlaces.length === 0) {
-    // if (!places || places.length === 0) { // // Without .populate()
-    return next(
-      new HttpError(`No results with user id ${userId}. ${err}`, 404)
-    );
+  if (!places || places.length === 0) {
+    console.error({ userId });
+    return next(new HttpError('No results for this user.', 404));
   }
 
   res.json({
-    places: userWithPlaces.places.map((place) =>
-      place.toObject({ getters: true })
-    ),
+    places: places.map((place) => place.toObject({ getters: true })),
   });
 };
 
 const createPlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.log(errors);
     const err = new HttpError(
       `Invalid inputs passed, please check your data. ${errors}`,
       422
@@ -182,9 +174,7 @@ const createPlace = async (req, res, next) => {
       description,
       address,
       location: coordinates,
-      // todo - This is a placeholder image
-      image:
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Empire_State_Building_in_Rainbow_Colors_for_Gay_Pride_2015_%2819258537982%29.jpg/2560px-Empire_State_Building_in_Rainbow_Colors_for_Gay_Pride_2015_%2819258537982%29.jpg',
+      image: req.file.path,
       creator,
     });
 
@@ -206,7 +196,6 @@ const createPlace = async (req, res, next) => {
       );
       return next(error);
     }
-    console.log(user);
 
     try {
       const session = await mongoose.startSession();
