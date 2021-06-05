@@ -1,4 +1,5 @@
 const HttpError = require('../models/http-error');
+const fs = require('fs');
 const { validationResult } = require('express-validator');
 const getGeocode = require('../util/location');
 const Place = require('../models/place');
@@ -78,6 +79,8 @@ const deletePlace = async (req, res, next) => {
     return next(error);
   }
 
+  const imagePath = place.image;
+
   try {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -93,6 +96,10 @@ const deletePlace = async (req, res, next) => {
     );
     return next(error);
   }
+
+  fs.unlink(imagePath, (err) => {
+    console.error(err);
+  });
 
   res.status(200).json({ message: 'Deleted Place.' });
 };
