@@ -13,7 +13,3 @@ npm run start
 cd client
 yarn start
 ```
-
-## Todo
-
-- Remove .env from app
