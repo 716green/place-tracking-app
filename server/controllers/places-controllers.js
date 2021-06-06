@@ -19,6 +19,7 @@ const getAllPlaces = async (req, res, next) => {
   });
 };
 
+//* UPDATE PLACE
 const updatePlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -43,6 +44,11 @@ const updatePlace = async (req, res, next) => {
     return next(error);
   }
 
+  if (place.creator.toString() !== req.userData.userId) {
+    const error = new HttpError('You can not modify this entry.', 401);
+    return next(error);
+  }
+
   place.title = title;
   place.description = description;
 
@@ -64,7 +70,7 @@ const deletePlace = async (req, res, next) => {
 
   let place;
   try {
-    //* ... .populate() searches other collections
+    //* ... .populate() searches other collections - extracts full user object in this instance
     place = await Place.findById(placeId).populate('creator');
   } catch (err) {
     const error = new HttpError(
@@ -76,6 +82,14 @@ const deletePlace = async (req, res, next) => {
 
   if (!place) {
     const error = new HttpError('Could not find place for this id.', 404);
+    return next(error);
+  }
+
+  if (place.creator.id !== req.userData.userId) {
+    const error = new HttpError(
+      'You can not modify this entry which belongs to a different user.',
+      401
+    );
     return next(error);
   }
 

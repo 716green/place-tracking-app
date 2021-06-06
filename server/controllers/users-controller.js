@@ -114,7 +114,7 @@ const signup = async (req, res, next) => {
 
   try {
     token = jwt.sign(dataToEncode, privateJwtServerKey, tokenOptions);
-  } catch (error) {
+  } catch (err) {
     const error = new HttpError(
       `Signup failed. Please try again later. ${err}`,
       500
@@ -144,7 +144,7 @@ const login = async (req, res, next) => {
   // Before bcryptjs
   // if (!existingUser || existingUser.password !== password) {
   if (!existingUser) {
-    const error = new HttpError('Invalid credentials. Unable to login.', 401);
+    const error = new HttpError('Invalid credentials. Unable to login.', 403);
     return next(error);
   }
 
@@ -180,7 +180,7 @@ const login = async (req, res, next) => {
         expiresIn: '1h',
       }
     );
-  } catch (error) {
+  } catch (err) {
     const error = new HttpError(
       `Login failed. Please try again later. ${err}`,
       500

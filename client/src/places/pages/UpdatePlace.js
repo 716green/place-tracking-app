@@ -39,37 +39,6 @@ const UpdatePlace = () => {
     false
   );
 
-  // const DUMMY_PLACES = [
-  //   {
-  //     id: '60ba4f6cddd68fa17f29687f',
-  //     title: 'Marienplatz',
-  //     description: 'A great place in Munich',
-  //     address: 'Marienplatz 1, Munich',
-  //     location: {
-  //       lat: 48.137440005381336,
-  //       lng: 11.574719963397229,
-  //     },
-  //     image:
-  //       'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Empire_State_Building_in_Rainbow_Colors_for_Gay_Pride_2015_%2819258537982%29.jpg/2560px-Empire_State_Building_in_Rainbow_Colors_for_Gay_Pride_2015_%2819258537982%29.jpg',
-  //     creator: '60b8f29cecaf626cee9fe75d',
-  //   },
-  //   {
-  //     id: '60ba4f6cddd68fa17f29687c',
-  //     title: 'Empire State Building',
-  //     description: 'Skyscraper',
-  //     address: '1 Empire Drive, New York, NY 10001',
-  //     location: {
-  //       lat: 48.137440005381336,
-  //       lng: 11.574719963397229,
-  //     },
-  //     image:
-  //       'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Empire_State_Building_in_Rainbow_Colors_for_Gay_Pride_2015_%2819258537982%29.jpg/2560px-Empire_State_Building_in_Rainbow_Colors_for_Gay_Pride_2015_%2819258537982%29.jpg',
-  //     creator: '60b8f29cecaf626cee9fe75d',
-  //   },
-  // ];
-
-  // const identifiedPlace = DUMMY_PLACES.find((p) => p.id === placeId);
-
   useEffect(() => {
     const fetchPlace = async () => {
       try {
@@ -89,7 +58,6 @@ const UpdatePlace = () => {
           true
         );
       } catch (err) {}
-      // const identifiedPlace = responseData.places.find((p) => p.id === placeId);
     };
     fetchPlace();
   }, [placeId, sendRequest, setFormData]);
@@ -106,11 +74,11 @@ const UpdatePlace = () => {
         }),
         {
           'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + auth.token,
         }
       );
       history.push('/' + auth.userId + '/places');
     } catch (err) {}
-    // console.log(formState.inputs);
   };
 
   if (isLoading) {

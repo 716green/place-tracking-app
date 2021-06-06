@@ -1,3 +1,0 @@
-ORIG_MDB_CONN_STR=mongodb+srv://bob:Ashland@2019@cluster0.18dix.mongodb.net/places?retryWrites=true&w=majority
-MDB_CONN_STR=mongodb+srv://bob:Ashland@2019@cluster0.18dix.mongodb.net/places-app?retryWrites=true&w=majority
-SECRET_ID_KEY="This_is_a_secret_key_that_JWTs_use_to_generate_tokens_exclusive_to_my_app"

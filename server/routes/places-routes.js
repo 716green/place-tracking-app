@@ -3,10 +3,10 @@ const router = express.Router();
 const placesControllers = require('../controllers/places-controllers.js');
 const { check } = require('express-validator');
 const fileUpload = require('../middleware/file-upload');
+const checkAuth = require('../middleware/check-auth');
 const {
   getPlacesByUserId,
   getPlaceById,
-  createPlace,
   updatePlace,
   deletePlace,
   getAllPlaces,
@@ -24,7 +24,7 @@ router.get('/:pid', getPlaceById);
 
 // This middleware is only valid for the routes below it. The 2 above routes can interact with anybody
 //* Verify incoming request's token
-router.use();
+router.use(checkAuth);
 
 //* POST
 router.post(
