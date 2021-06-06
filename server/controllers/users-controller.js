@@ -1,6 +1,10 @@
 const HttpError = require('../models/http-error');
 const User = require('../models/user');
 
+require('dotenv').config();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
 const getUsers = async (req, res, next) => {
   let users;
   try {
@@ -62,11 +66,29 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
+  let hashedPassword;
+  // password variable is plaintext which is safe with HTTPS
+  const saltRoundCount = 12;
+  // 12 is a good number of salt rounds to be safe and fast
+  // returns promise
+  try {
+    hashedPassword = await bcrypt.hash(password, saltRoundCount);
+  } catch (err) {
+    // HttpError is a modification made to the default Error class to create a custom class
+    // with error codes and messages.
+    const error = new HttpError(
+      'Could not create user, please try again.',
+      500
+    );
+    // next refers to ... async (req, res, next)
+    return next(error);
+  }
+
   const createdUser = new User({
     name,
     email,
     image: req.file.path,
-    password,
+    password: hashedPassword,
     places: [],
   });
 
@@ -77,7 +99,32 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
-  res.status(201).json({ user: createdUser.toObject({ getters: true }) });
+  let token;
+  // jwt sign method returns the token string
+  const dataToEncode = {
+    userId: createdUser.id,
+    email: createdUser.email,
+  };
+
+  const privateJwtServerKey = process.env.SECRET_ID_KEY;
+
+  const tokenOptions = {
+    expiresIn: '1h',
+  };
+
+  try {
+    token = jwt.sign(dataToEncode, privateJwtServerKey, tokenOptions);
+  } catch (error) {
+    const error = new HttpError(
+      `Signup failed. Please try again later. ${err}`,
+      500
+    );
+    return next(error);
+  }
+
+  res
+    .status(201)
+    .json({ user: createdUser.id, email: createdUser.email, token: token });
 };
 
 const login = async (req, res, next) => {
@@ -94,13 +141,57 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
-  if (!existingUser || existingUser.password !== password) {
+  // Before bcryptjs
+  // if (!existingUser || existingUser.password !== password) {
+  if (!existingUser) {
     const error = new HttpError('Invalid credentials. Unable to login.', 401);
     return next(error);
   }
+
+  let isValidPassword = false;
+  try {
+    isValidPassword = await bcrypt.compare(password, existingUser.password);
+  } catch (err) {
+    const error = new HttpError(
+      'Could not log you in, please check your credentials and try again.',
+      500
+    );
+    return next(error);
+  }
+
+  if (!isValidPassword) {
+    const error = new HttpError(
+      'Invalid credentials, could not log you in.',
+      401
+    );
+    return next(error);
+  }
+
+  // Look to the signup method to see a more clean implimentation of this code.
+  let token;
+  try {
+    token = jwt.sign(
+      {
+        userId: existingUser.id,
+        email: existingUser.email,
+      },
+      process.env.SECRET_ID_KEY,
+      {
+        expiresIn: '1h',
+      }
+    );
+  } catch (error) {
+    const error = new HttpError(
+      `Login failed. Please try again later. ${err}`,
+      500
+    );
+    return next(error);
+  }
+
   res.status(200).json({
-    message: 'Logged In',
-    user: existingUser.toObject({ getters: true }),
+    userId: existingUser.id,
+    email: existingUser.email,
+    token: token,
   });
 };
 
