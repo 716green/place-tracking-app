@@ -16,11 +16,11 @@ const {
 //* **** PLACES ROUTES ******
 //* *************************
 
-//* GET - UID
-router.get('/user/:uid', getPlacesByUserId);
-
 //* GET - PID
 router.get('/:pid', getPlaceById);
+
+//* GET - UID
+router.get('/user/:uid', getPlacesByUserId);
 
 // This middleware is only valid for the routes below it. The 2 above routes can interact with anybody
 //* Verify incoming request's token

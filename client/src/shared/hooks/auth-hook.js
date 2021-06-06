@@ -1,11 +1,12 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useState, useCallback, useEffect } from 'react';
+
+let logoutTimer;
 
 export const useAuth = () => {
   const [token, setToken] = useState(false);
   const [tokenExpirationDate, setTokenExpirationDate] = useState();
   const [userId, setUserId] = useState(false);
-
-  let logoutTimer;
 
   const login = useCallback((uid, token, expirationDate) => {
     setToken(token);

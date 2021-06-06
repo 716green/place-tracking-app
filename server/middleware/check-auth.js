@@ -14,15 +14,13 @@ module.exports = (req, res, next) => {
     if (!token) {
       throw new Error('Authentication failed!');
     }
-
     const decodedToken = jwt.verify(token, process.env.SECRET_ID_KEY);
-    // Pull userId out of token because we added it in when creating
-    const { userId } = decodedToken;
-    req.userData = userId;
+    req.userData = { userId: decodedToken.userId };
     // Allow request to continue it's journey
     next();
   } catch (err) {
-    const error = new HttpError('Unable to verify user authentication', 401);
+    const error = new HttpError('Unable to verify user authentication.', 401);
+    console.error(err);
     return next(error);
   }
 };
