@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import { AuthContext } from './shared/context/auth-context';
 import {
   BrowserRouter as Router,
@@ -12,24 +12,14 @@ import UpdatePlace from './places/pages/UpdatePlace';
 import UserPlaces from './places/pages/UserPlaces';
 import Auth from './places/pages/Auth';
 import MainNavigaton from './shared/components/Navigation/MainNavigation';
+import { useAuth } from './shared/hooks/auth-hook';
 
 export const baseURL = 'http://localhost:5000/api';
 
 const App = () => {
-  const [token, setToken] = useState(false);
-  const [userId, setUserId] = useState(false);
-
-  const login = useCallback((uid, token) => {
-    setToken(token);
-    setUserId(uid);
-  }, []);
-
-  const logout = useCallback(() => {
-    setToken(null);
-    setUserId(null);
-  }, []);
-
   let routes;
+
+  const { token, login, logout, userId } = useAuth();
 
   if (token) {
     routes = (
