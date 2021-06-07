@@ -1,7 +1,8 @@
 const HttpError = require('../models/http-error');
 const User = require('../models/user');
 
-require('dotenv').config();
+// require('dotenv').config();
+// require('dotenv/config');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 

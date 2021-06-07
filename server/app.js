@@ -3,9 +3,11 @@ const path = require('path');
 const express = require('express');
 const app = express();
 const port = 5000;
+// const port = process.env.PORT || 5000;
 const HttpError = require('./models/http-error');
 const mongoose = require('mongoose');
-require('dotenv/config');
+// require('dotenv/config');
+// require('dotenv').config();
 
 const placesRoutes = require('./routes/places-routes');
 const usersRoutes = require('./routes/users-routes');
